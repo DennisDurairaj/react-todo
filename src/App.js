@@ -16,17 +16,17 @@ class App extends Component {
   }
 
   componentWillMount() {
-    TodoStore.on("TodoAdded", () => {
-      this.setState({
-        todos: TodoStore.getAllTodos()
-      });
-    });
+    TodoStore.on("TodoAdded", this.getAllTodos);
 
-    TodoStore.on("TodoRemoved", () => {
-      this.setState({
-        todos: TodoStore.getAllTodos()
-      });
-    });
+    TodoStore.on("TodoRemoved", this.getAllTodos);
+  }
+
+  componentWillUnmount() {
+    TodoStore.removeListener("TodoAdded", this.getTodos)
+  }
+
+  getAllTodos = () => {
+    this.setState({todos: TodoStore.getAllTodos()});
   }
 
   removeTodo(id) {
@@ -40,7 +40,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Title number={this.state.todos.length} />
+        <Title number={this.state.todos.length}/>
         <TodoForm addTodo={this.addTodo}/>
         <TodoList todos={this.state.todos} remove={this.removeTodo}/>
       </div>
