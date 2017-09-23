@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
-import todos from './data/todos';
+import TodoStore from './stores/TodoStore';
+import * as TodoActions from './actions/TodoActions'
 import TodoForm from './TodoForm.js';
 import TodoList from './TodoList';
 import Title from './Title';
@@ -10,21 +11,30 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      todos
+      todos: TodoStore.getAllTodos()
     }
   }
- addTodo = (val) => {
-    const todo = {text: val, id: this.state.todos.length+1};
-    this.state.todos.push(todo);
-    this.setState({todos: this.state.todos});
-  }
-  
 
-  removeTodo = (id) => {
-    const remainders = this.state.todos.filter((todo) => {
-      if(todo.id !== id) return todo;
+  componentWillMount() {
+    TodoStore.on("TodoAdded", () => {
+      this.setState({
+        todos: TodoStore.getAllTodos()
+      });
     });
-    this.setState({todos: remainders});
+
+    TodoStore.on("TodoRemoved", () => {
+      this.setState({
+        todos: TodoStore.getAllTodos()
+      });
+    });
+  }
+
+  removeTodo(id) {
+    TodoActions.removeTodo(id);
+  }
+
+  addTodo(text) {
+    TodoActions.addTodo(text);
   }
 
   render() {
